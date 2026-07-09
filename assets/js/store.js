@@ -33,7 +33,7 @@ const DataStore = {
    * هل يوجد رابط API حقيقي مهيأ؟
    */
   isApiConfigured() {
-    return CONFIG.API.BASE_URL && !CONFIG.API.BASE_URL.includes('YOUR_SCRIPT_ID');
+    return CONFIG.API.BASE_URL && !CONFIG.API.BASE_URL.includes('AKfycbxUWeIIifeVRqD9L8FI7TaO3E3jRTSqYtII7Jedquy_J4B8OPPfY6KnEKQsnd8m1DTITg');
   },
 
   _key(entity) {
