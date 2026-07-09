@@ -15,14 +15,14 @@
  * 3. تحقق من كلمات المرور عبر الخادم (Google Apps Script) فقط، وليس في الفرونت إند.
  */
 const DEMO_CREDENTIALS = Object.freeze({
-  email: 'admin@example.com',
-  password: 'admin123'
+  email: 'AhmedBatity@example.com',
+  password: '2231986'
 });
 
 const CONFIG = {
   // API Configuration
   API: {
-    BASE_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbxUWeIIifeVRqD9L8FI7TaO3E3jRTSqYtII7Jedquy_J4B8OPPfY6KnEKQsnd8m1DTITg/exec',
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000
