@@ -1,0 +1,111 @@
+/* =========================================
+   Ahmed batity - ERP - متغيرات التصميم
+   هوية بصرية: "دفتر الأستاذ الرقمي"
+   ========================================= */
+
+:root {
+  /* ===== لون الهوية (Brand) ===== */
+  --primary: #1F5F5B;
+  --primary-dark: #123F3C;
+  --primary-light: #E4EFEE;
+  --primary-rgb: 31, 95, 91;
+
+  /* ===== الألوان الدلالية (منزوعة التشبع، هادئة) ===== */
+  --secondary: #5B6B67;
+  --success: #2E7D5B;
+  --success-light: #E6F2EC;
+  --info: #3E6E8E;
+  --info-light: #E8F1F6;
+  --warning: #B7791F;
+  --warning-light: #FBF1E1;
+  --danger: #B3403A;
+  --danger-light: #F8E9E8;
+  --light: #F7F8F7;
+  --dark: #12181B;
+
+  /* ===== لوحة موسّعة (لأغراض التصنيفات فقط، غير مسيطرة) ===== */
+  --purple: #5B4E77;
+  --pink: #8C4B63;
+  --orange: #A8622E;
+  --teal: #2E7D6F;
+  --cyan: #3E6E8E;
+
+  /* ===== المحايدات (دافئة قليلاً، ليست رمادي Bootstrap القياسي) ===== */
+  --white: #ffffff;
+  --gray-100: #F7F8F7;
+  --gray-200: #EEF1F0;
+  --gray-300: #E1E6E4;
+  --gray-400: #C7CFCC;
+  --gray-500: #9AA6A2;
+  --gray-600: #6D7A76;
+  --gray-700: #4B5B60;
+  --gray-800: #2A3336;
+  --gray-900: #12181B;
+
+  /* ===== الخلفيات ===== */
+  --bg-body: #F2F4F3;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #12181B;
+  --bg-topbar: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: #F0F3F2;
+  --bg-active: #E4EFEE;
+
+  /* ===== النصوص ===== */
+  --text-primary: #12181B;
+  --text-secondary: #4B5B60;
+  --text-muted: #8B9895;
+  --text-white: #ffffff;
+
+  /* ===== الحدود ===== */
+  --border-color: #E1E6E4;
+  --border-radius-sm: 0.25rem;
+  --border-radius: 0.375rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+
+  /* ===== الظلال (خفيفة جداً، مسطحة أكثر من الظلال الافتراضية) ===== */
+  --shadow-sm: 0 1px 2px rgba(18,24,27,0.04);
+  --shadow: 0 1px 3px rgba(18,24,27,0.08), 0 1px 2px rgba(18,24,27,0.04);
+  --shadow-md: 0 4px 10px rgba(18,24,27,0.08);
+  --shadow-lg: 0 8px 24px rgba(18,24,27,0.10);
+  --shadow-xl: 0 16px 40px rgba(18,24,27,0.14);
+
+  /* ===== زجاجية (للعناصر العائمة فقط) ===== */
+  --glass-bg: rgba(255,255,255,0.9);
+  --glass-border: rgba(255,255,255,0.4);
+  --glass-shadow: 0 8px 32px rgba(18,24,27,0.12);
+
+  /* ===== القياسات ===== */
+  --sidebar-width: 272px;
+  --sidebar-collapsed: 76px;
+  --topbar-height: 60px;
+  --content-padding: 1.5rem;
+
+  /* ===== الانتقالات ===== */
+  --transition-fast: 0.12s ease;
+  --transition: 0.2s ease;
+  --transition-slow: 0.4s ease;
+
+  /* ===== الخطوط =====
+     IBM Plex Sans Arabic: خط عربي احترافي بأوزان حقيقية (يستخدم فعلياً
+     في منتجات مالية/مصرفية عربية)، مع IBM Plex Mono للأرقام والرموز
+     المرجعية بنمط دفتري محاسبي. */
+  --font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  --font-family-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.25rem;
+
+  /* ===== طبقات ===== */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal: 1040;
+  --z-popover: 1050;
+  --z-tooltip: 1060;
+  --z-toast: 1070;
+  --z-loading: 1080;
+}

@@ -1,0 +1,239 @@
+/* =========================================
+   Ahmed Batity ERP - Component Styles
+   ========================================= */
+
+/* =========================================
+   Dashboard Specific
+   ========================================= */
+.dashboard-header {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-header h1 {
+  font-size: 1.625rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* Chart Container */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+.chart-container-sm {
+  height: 200px;
+}
+
+/* =========================================
+   Calendar Widget
+   ========================================= */
+.calendar-widget {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-header h6 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: var(--border-color);
+}
+
+.calendar-day-header {
+  background: var(--bg-hover);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  background: var(--bg-card);
+  padding: 0.5rem;
+  text-align: center;
+  min-height: 84px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.calendar-day:hover {
+  background: var(--bg-hover);
+}
+
+.calendar-day.today {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.calendar-day.today .calendar-day-number {
+  color: var(--primary);
+}
+
+.calendar-day-number {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.calendar-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calendar-event-tag {
+  font-size: 10px;
+  line-height: 1.4;
+  color: #fff;
+  border-radius: 4px;
+  padding: 1px 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.calendar-event-tag:hover {
+  filter: brightness(0.92);
+}
+
+.calendar-event-more {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: right;
+  padding: 0 4px;
+}
+
+.calendar-day.other-month {
+  color: var(--text-muted);
+}
+
+/* =========================================
+   Kanban Board
+   ========================================= */
+.kanban-column {
+  min-width: 300px;
+  background: var(--bg-hover);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.kanban-column-header h6 {
+  margin: 0;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.kanban-count {
+  background: var(--bg-card);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.kanban-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  cursor: grab;
+  transition: all var(--transition-fast);
+}
+
+.kanban-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.kanban-card h6 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.kanban-card p {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.kanban-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.kanban-card-tags {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.kanban-tag {
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+}
+
+/* =========================================
+   File Upload
+   ========================================= */
+/* =========================================
+   Print Styles
+   ========================================= */
+@media print {
+  .sidebar, .topbar, .page-actions, .btn {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+
+  body {
+    background: white !important;
+  }
+}

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1F5F5B">
+    <meta name="description" content="Ahmed batity - ERP لإدارة موارد المؤسسات">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Ahmed batity - ERP</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/images/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Libraries CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- Custom CSS (bundled) -->
+    <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <img src="assets/images/icon-192.png" alt="Ahmed Batity ERP" class="loading-logo">
+            <div class="spinner-ring"></div>
+            <h4>جاري التحميل...</h4>
+            <p>Ahmed batity - ERP</p>
+        </div>
+    </div>
+
+    <!-- Skeleton Loading -->
+    <div id="skeleton-loader" class="skeleton-loader" style="display:none;">
+        <div class="skeleton-header"></div>
+        <div class="skeleton-sidebar"></div>
+        <div class="skeleton-content"></div>
+    </div>
+
+    <!-- App Container -->
+    <div id="app" class="app-wrapper" style="display:none;">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <img src="assets/images/icon-192.png" alt="Ahmed Batity ERP">
+                </div>
+                <div class="brand-text">
+                    <h5>Ahmed batity</h5>
+                    <span>نظام إدارة الموارد</span>
+                </div>
+                <button id="sidebar-toggle" class="sidebar-toggle d-lg-none">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="#dashboard" data-page="dashboard">
+                            <span class="nav-item-ref">00</span>
+                            <i class="fas fa-chart-line"></i>
+                            <span>الرئيسية</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#customers" data-page="customers">
+                            <span class="nav-item-ref">01</span>
+                            <i class="fas fa-users"></i>
+                            <span>العملاء</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#suppliers" data-page="suppliers">
+                            <span class="nav-item-ref">02</span>
+                            <i class="fas fa-truck"></i>
+                            <span>الموردين</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#products" data-page="products">
+                            <span class="nav-item-ref">03</span>
+                            <i class="fas fa-boxes"></i>
+                            <span>المنتجات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#inventory" data-page="inventory">
+                            <span class="nav-item-ref">04</span>
+                            <i class="fas fa-warehouse"></i>
+                            <span>المخزون</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="submenu-toggle">
+                            <span class="nav-item-ref">05</span>
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>المبيعات</span>
+                            <i class="fas fa-chevron-left submenu-arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="#sales" data-page="sales">فواتير المبيعات</a></li>
+                            <li><a href="#sales-returns" data-page="sales-returns">مردودات المبيعات</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="submenu-toggle">
+                            <span class="nav-item-ref">06</span>
+                            <i class="fas fa-shopping-basket"></i>
+                            <span>المشتريات</span>
+                            <i class="fas fa-chevron-left submenu-arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="#purchases" data-page="purchases">فواتير المشتريات</a></li>
+                            <li><a href="#purchase-returns" data-page="purchase-returns">مردودات المشتريات</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#expenses" data-page="expenses">
+                            <span class="nav-item-ref">07</span>
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>المصروفات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#income" data-page="income">
+                            <span class="nav-item-ref">08</span>
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <span>الإيرادات</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="submenu-toggle">
+                            <span class="nav-item-ref">09</span>
+                            <i class="fas fa-user-tie"></i>
+                            <span>الموظفين</span>
+                            <i class="fas fa-chevron-left submenu-arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="#employees" data-page="employees">الموظفين</a></li>
+                            <li><a href="#attendance" data-page="attendance">الحضور والانصراف</a></li>
+                            <li><a href="#tasks" data-page="tasks">المهام</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#calendar" data-page="calendar">
+                            <span class="nav-item-ref">10</span>
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>التقويم</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reports" data-page="reports">
+                            <span class="nav-item-ref">11</span>
+                            <i class="fas fa-file-alt"></i>
+                            <span>التقارير</span>
+                        </a>
+                    </li>
+                    <li class="nav-divider"></li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="submenu-toggle">
+                            <i class="fas fa-cog"></i>
+                            <span>الإعدادات</span>
+                            <i class="fas fa-chevron-left submenu-arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="#settings" data-page="settings">الإعدادات العامة</a></li>
+                            <li><a href="#users" data-page="users">المستخدمين</a></li>
+                            <li><a href="#backup" data-page="backup">النسخ الاحتياطي</a></li>
+                            <li><a href="#logs" data-page="logs">سجل النشاط</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span id="current-user-name">...</span>
+                        <small id="current-user-role">...</small>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button id="menu-toggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <nav aria-label="breadcrumb" class="d-none d-md-block">
+                        <ol class="breadcrumb" id="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#dashboard">الرئيسية</a></li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="topbar-center">
+                    <div class="global-search" id="global-search">
+                        <i class="fas fa-search global-search-icon"></i>
+                        <input type="text" id="global-search-input" class="global-search-input"
+                               placeholder="بحث شامل... (عملاء، منتجات، فواتير، مهام)" autocomplete="off">
+                        <button type="button" class="global-search-clear d-none" id="global-search-clear" aria-label="مسح">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <div class="global-search-results" id="global-search-results"></div>
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-actions">
+                        <button class="action-btn" id="fullscreen-btn" title="ملء الشاشة">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn notification-btn" id="notifications-btn" title="الإشعارات">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge" id="notification-count">0</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper" id="content-area">
+                <!-- Dynamic content loads here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="login-modal">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-brand">
+                    <div class="login-logo">
+                        <img src="assets/images/icon-192.png" alt="Ahmed Batity ERP">
+                    </div>
+                    <h3>Ahmed batity - ERP</h3>
+                    <p>نظام تخطيط موارد المؤسسات</p>
+                </div>
+                <form id="login-form" class="login-form">
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="login-email" placeholder="name@example.com" required>
+                        <label for="login-email">البريد الإلكتروني</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="login-password" placeholder="كلمة المرور" required>
+                        <label for="login-password">كلمة المرور</label>
+                        <button type="button" class="password-toggle" id="toggle-password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="remember-me">
+                        <label class="form-check-label" for="remember-me">تذكرني</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 login-btn">
+                        <i class="fas fa-sign-in-alt me-2"></i>تسجيل الدخول
+                    </button>
+                    <div class="login-links">
+                        <a href="#" id="forgot-password-link">نسيت كلمة المرور؟</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Screen (يظهر عند فتح رابط إعادة التعيين من البريد الإلكتروني) -->
+    <div id="reset-password-modal" class="login-modal" style="display:none;">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-brand">
+                    <div class="login-logo">
+                        <img src="assets/images/icon-192.png" alt="Ahmed Batity ERP">
+                    </div>
+                    <h3>تعيين كلمة مرور جديدة</h3>
+                    <p>أدخل كلمة المرور الجديدة لحسابك</p>
+                </div>
+                <form id="reset-password-form" class="login-form">
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="reset-new-password" placeholder="كلمة المرور الجديدة" minlength="8" required>
+                        <label for="reset-new-password">كلمة المرور الجديدة</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="reset-confirm-password" placeholder="تأكيد كلمة المرور" minlength="8" required>
+                        <label for="reset-confirm-password">تأكيد كلمة المرور</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 login-btn">
+                        <i class="fas fa-key me-2"></i>تعيين كلمة المرور
+                    </button>
+                    <div class="login-links">
+                        <a href="#" id="back-to-login-link">رجوع لتسجيل الدخول</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Dynamic Form Modal -->
+    <div class="modal fade" id="app-form-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <form id="app-form-modal-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="app-form-modal-title">إضافة</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="إغلاق"></button>
+                    </div>
+                    <div class="modal-body" id="app-form-modal-body">
+                        <!-- Fields injected dynamically -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="submit" class="btn btn-primary" id="app-form-modal-submit">
+                            <i class="fas fa-save"></i> حفظ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Panel -->
+    <div id="notifications-panel" class="notifications-panel">
+        <div class="notifications-header">
+            <h6>الإشعارات</h6>
+            <button id="mark-all-read" class="btn btn-sm btn-link">تحديد الكل كمقروء</button>
+        </div>
+        <div class="notifications-list" id="notifications-list">
+            <!-- Notifications loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+
+    <!-- Core Scripts -->
+    <script src="assets/js/config.js" defer></script>
+    <script src="assets/js/utils.js" defer></script>
+    <script src="assets/js/logger.js" defer></script>
+    <script src="assets/js/export.js" defer></script>
+    <script src="assets/js/print.js" defer></script>
+    <script src="assets/js/api.js" defer></script>
+    <script src="assets/js/auth.js" defer></script>
+    <script src="assets/js/router.js" defer></script>
+    <script src="assets/js/ui.js" defer></script>
+    <script src="assets/js/store.js" defer></script>
+    <script src="assets/js/forms.js" defer></script>
+    <script src="assets/js/components.js" defer></script>
+    <script src="assets/js/global-search.js" defer></script>
+    <script src="assets/js/app.js" defer></script>
+    <script src="assets/js/pwa-update.js" defer></script>
+
+    <script defer>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(reg => {
+                        console.log('SW registered');
+                        if (window.PWAUpdate) window.PWAUpdate.watch(reg);
+                    })
+                    .catch(err => console.log('SW error', err));
+            });
+        }
+    </script>
+</body>
+</html>

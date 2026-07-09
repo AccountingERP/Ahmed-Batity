@@ -1,0 +1,80 @@
+/* =========================================
+   Ahmed Batity ERP - RTL Specific Styles
+   ========================================= */
+
+[dir="rtl"] .sidebar {
+  right: 0;
+  left: auto;
+  border-left: 1px solid var(--border-color);
+  border-right: none;
+}
+
+[dir="rtl"] .main-content {
+  margin-right: var(--sidebar-width);
+  margin-left: 0;
+}
+
+[dir="rtl"] .submenu-arrow {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+[dir="rtl"] .submenu li a {
+  padding-right: 2.5rem;
+  padding-left: 1.25rem;
+}
+
+[dir="rtl"] .toast-container {
+  left: 1rem;
+  right: auto;
+}
+
+[dir="rtl"] .custom-toast {
+  border-right: none;
+  border-left: 4px solid var(--primary);
+  animation: slideInRight 0.3s ease;
+}
+
+[dir="rtl"] .custom-toast.success { border-left-color: var(--success); }
+[dir="rtl"] .custom-toast.error { border-left-color: var(--danger); }
+[dir="rtl"] .custom-toast.warning { border-left-color: var(--warning); }
+[dir="rtl"] .custom-toast.info { border-left-color: var(--info); }
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+[dir="rtl"] .notifications-panel {
+  left: 1rem;
+  right: auto;
+}
+
+[dir="rtl"] .dropdown-item i {
+  margin-left: 0.5rem;
+  margin-right: 0;
+}
+
+[dir="rtl"] .password-toggle {
+  left: 0.75rem;
+  right: auto;
+}
+
+/* Mobile RTL */
+@media (max-width: 768px) {
+  [dir="rtl"] .sidebar {
+    transform: translateX(100%);
+  }
+
+  [dir="rtl"] .sidebar.show {
+    transform: translateX(0);
+  }
+
+  [dir="rtl"] .main-content {
+    margin-right: 0;
+  }
+
+  [dir="rtl"] .custom-toast {
+    animation: slideUp 0.3s ease;
+  }
+}
