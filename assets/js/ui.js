@@ -70,6 +70,17 @@ const UI = {
       });
     }
 
+    // Logout button
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', async () => {
+        const confirmed = await UI.confirm('تسجيل الخروج', 'هل أنت متأكد من رغبتك في تسجيل الخروج؟');
+        if (confirmed) {
+          Auth.logout();
+        }
+      });
+    }
+
     // Close sidebar on outside click (mobile)
     document.addEventListener('click', (e) => {
       if (window.innerWidth <= 768 && 

@@ -469,6 +469,8 @@ body {
 
 .user-details {
   overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .user-details span {
@@ -484,6 +486,25 @@ body {
 .user-details small {
   font-size: var(--font-size-xs);
   color: rgba(255,255,255,0.5);
+}
+
+.logout-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.logout-btn:hover {
+  background: var(--danger);
+  color: #ffffff;
 }
 
 /* =========================================

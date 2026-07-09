@@ -82,6 +82,8 @@ const Forms = {
       fields: [
         { name: 'name', label: 'اسم المنتج', type: 'text', required: true },
         { name: 'sku', label: 'الرمز (SKU)', type: 'text', required: true },
+        { name: 'category', label: 'الفئة', type: 'text', required: false, suggestFrom: 'category',
+          placeholder: 'اكتب أي فئة تريدها (مثال: إلكترونيات، أثاث...) - اختياري' },
         { name: 'price', label: 'سعر البيع', type: 'number', required: true, step: '0.01' },
         { name: 'cost', label: 'سعر التكلفة', type: 'number', required: false, step: '0.01' },
         { name: 'quantity', label: 'الكمية بالمخزون', type: 'number', required: false, default: 0 },
@@ -147,7 +149,8 @@ const Forms = {
       entity: 'expenses',
       fields: [
         { name: 'date', label: 'التاريخ', type: 'date', required: true, default: 'today' },
-        { name: 'category', label: 'الفئة', type: 'text', required: true },
+        { name: 'category', label: 'الفئة', type: 'text', required: true, suggestFrom: 'category',
+          placeholder: 'اكتب فئة المصروف (مثال: إيجار، رواتب...)' },
         { name: 'description', label: 'الوصف', type: 'text', required: true },
         { name: 'amount', label: 'المبلغ', type: 'number', required: true, step: '0.01' }
       ]
@@ -158,7 +161,8 @@ const Forms = {
       entity: 'income',
       fields: [
         { name: 'date', label: 'التاريخ', type: 'date', required: true, default: 'today' },
-        { name: 'category', label: 'الفئة', type: 'text', required: true },
+        { name: 'category', label: 'الفئة', type: 'text', required: true, suggestFrom: 'category',
+          placeholder: 'اكتب فئة الإيراد (مثال: مبيعات، خدمات...)' },
         { name: 'description', label: 'الوصف', type: 'text', required: true },
         { name: 'amount', label: 'المبلغ', type: 'number', required: true, step: '0.01' }
       ]
@@ -305,10 +309,13 @@ const Forms = {
           class="form-control"
           name="${field.name}"
           value="${Utils.sanitizeHtml(value !== undefined && value !== null ? String(value) : '')}"
+          ${field.placeholder ? `placeholder="${Utils.sanitizeHtml(field.placeholder)}"` : ''}
           ${field.step ? `step="${field.step}"` : ''}
           ${field.type === 'date' && field.allowFuture ? 'data-allow-future="true"' : ''}
+          ${field.suggestFrom ? `list="datalist-${field.name}"` : ''}
           ${field.required ? 'required' : ''}
-        >`;
+        >
+        ${field.suggestFrom ? this._buildDatalist(field) : ''}`;
       }
 
       return `
@@ -317,6 +324,23 @@ const Forms = {
           ${inputHtml}
         </div>`;
     }).join('') + `</div>`;
+  },
+
+  /**
+   * يبني datalist لحقل نصي من القيم الفعلية الفريدة المستخدمة سابقًا في نفس
+   * الحقل عبر سجلات نفس الكيان - اقتراح فقط وليس قيدًا (المستخدم يقدر يكتب
+   * أي قيمة جديدة يريدها بحرية تامة)
+   */
+  _buildDatalist(field) {
+    let values = [];
+    try {
+      const items = DataStore.list(this.currentSchema.entity);
+      values = [...new Set(items.map(i => i[field.suggestFrom]).filter(Boolean))];
+    } catch (e) { /* تجاهل لو الكيان غير متاح بعد */ }
+
+    return `<datalist id="datalist-${field.name}">
+      ${values.map(v => `<option value="${Utils.sanitizeHtml(v)}">`).join('')}
+    </datalist>`;
   },
 
   _resolveValue(field, data) {

@@ -84,7 +84,7 @@ const Components = {
         <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="100">
           <div class="card">
             <div class="card-header">
-              <h5><i class="fas fa-chart-pie me-2"></i>توزيع المبيعات</h5>
+              <h5><i class="fas fa-chart-pie me-2"></i>توزيع المنتجات حسب الفئة</h5>
             </div>
             <div class="card-body">
               <div class="chart-container chart-container-sm">
@@ -169,28 +169,60 @@ const Components = {
       });
     }
 
+    this._renderCategoryChart();
+  },
+
+  /**
+   * يبني رسم "توزيع المنتجات حسب الفئة" من الفئات الفعلية التي كتبها
+   * المستخدم بنفسه (حقل نصي حر في نموذج المنتج)، وليس من قائمة ثابتة.
+   * القيمة المعروضة لكل فئة = مجموع (السعر × الكمية) لكل منتجاتها.
+   */
+  _renderCategoryChart() {
     const pieCtx = document.getElementById('salesPieChart');
-    if (pieCtx) {
-      new Chart(pieCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['إلكترونيات', 'أثاث', 'ملابس', 'أخرى'],
-          datasets: [{
-            data: [0, 0, 0, 0],
-            backgroundColor: ['#1F5F5B', '#2E7D5B', '#B7791F', '#6D7A76'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
-          },
-          cutout: '65%'
-        }
-      });
+    if (!pieCtx) return;
+
+    const products = DataStore.list('products');
+    const totalsByCategory = {};
+
+    products.forEach(p => {
+      const category = (p.category && String(p.category).trim()) || 'بدون فئة';
+      const value = (Number(p.price) || 0) * (Number(p.quantity) || 0);
+      totalsByCategory[category] = (totalsByCategory[category] || 0) + value;
+    });
+
+    const labels = Object.keys(totalsByCategory);
+    const data = Object.values(totalsByCategory);
+
+    // لوحة ألوان تتسع لأي عدد من الفئات التي يضيفها المستخدم (وليست محدودة بـ 4)
+    const palette = ['#1F5F5B', '#2E7D5B', '#B7791F', '#6D7A76', '#4A6FA5', '#8B5CF6', '#DB2777', '#D97706'];
+    const colors = labels.map((_, i) => palette[i % palette.length]);
+
+    const noData = labels.length === 0 || data.every(v => v === 0);
+
+    if (this._categoryChartInstance) {
+      this._categoryChartInstance.destroy();
     }
+
+    this._categoryChartInstance = new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: noData ? ['لا توجد بيانات بعد'] : labels,
+        datasets: [{
+          data: noData ? [1] : data,
+          backgroundColor: noData ? ['#E5E7EB'] : colors,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } },
+          tooltip: { enabled: !noData }
+        },
+        cutout: '65%'
+      }
+    });
   },
 
   // ====================
