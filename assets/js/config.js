@@ -15,8 +15,8 @@
  * 3. تحقق من كلمات المرور عبر الخادم (Google Apps Script) فقط، وليس في الفرونت إند.
  */
 const DEMO_CREDENTIALS = Object.freeze({
-  email: 'admin@example.com',
-  password: 'admin123'
+  email: 'AhmedBatity@example.com',
+  password: '2231986'
 });
 
 const CONFIG = {
