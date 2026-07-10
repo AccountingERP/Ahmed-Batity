@@ -19,8 +19,8 @@ const Print = {
   /**
    * يطبع فاتورة واحدة (مبيعات أو مشتريات) بتنسيق A4 منسّق
    */
-  invoice(entityKey, id) {
-    const record = DataStore.get(entityKey, id);
+  async invoice(entityKey, id) {
+    const record = await DataStore.get(entityKey, id);
     if (!record) {
       UI.showToast('تعذّر العثور على الفاتورة', 'error');
       return;

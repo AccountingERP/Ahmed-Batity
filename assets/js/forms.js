@@ -238,7 +238,7 @@ const Forms = {
   /**
    * فتح نموذج إضافة جديد
    */
-  openCreate(entityKey, defaults = {}) {
+  async openCreate(entityKey, defaults = {}) {
     const schema = this.schemas[entityKey];
     if (!schema) {
       UI.showToast('نموذج غير معرّف لهذا القسم', 'error');
@@ -247,19 +247,19 @@ const Forms = {
     this.currentSchema = schema;
     this.currentEntity = entityKey;
     this.currentId = null;
-    this._render(schema.title.add, defaults || {});
+    await this._render(schema.title.add, defaults || {});
   },
 
   /**
    * فتح نموذج تعديل لسجل موجود
    */
-  openEdit(entityKey, id) {
+  async openEdit(entityKey, id) {
     const schema = this.schemas[entityKey];
     if (!schema) {
       UI.showToast('نموذج غير معرّف لهذا القسم', 'error');
       return;
     }
-    const record = DataStore.get(schema.entity, id);
+    const record = await DataStore.get(schema.entity, id);
     if (!record) {
       UI.showToast('لم يتم العثور على السجل', 'error');
       return;
@@ -267,19 +267,19 @@ const Forms = {
     this.currentSchema = schema;
     this.currentEntity = entityKey;
     this.currentId = id;
-    this._render(schema.title.edit, record);
+    await this._render(schema.title.edit, record);
   },
 
   /**
    * بناء حقول النموذج داخل المودال وعرضه
    */
-  _render(title, data) {
+  async _render(title, data) {
     const titleEl = document.getElementById('app-form-modal-title');
     const bodyEl = document.getElementById('app-form-modal-body');
     if (!titleEl || !bodyEl) return;
 
     titleEl.textContent = title;
-    bodyEl.innerHTML = this._buildFieldsHtml(this.currentSchema.fields, data);
+    bodyEl.innerHTML = await this._buildFieldsHtml(this.currentSchema.fields, data);
 
     const modalEl = document.getElementById('app-form-modal');
     if (!this.modalInstance) {
@@ -299,8 +299,8 @@ const Forms = {
     this.modalInstance.show();
   },
 
-  _buildFieldsHtml(fields, data) {
-    return `<div class="row g-3">` + fields.map(field => {
+  async _buildFieldsHtml(fields, data) {
+    const fieldsHtml = await Promise.all(fields.map(async field => {
       const value = this._resolveValue(field, data);
       const colClass = field.colClass || 'col-md-6';
       let inputHtml = '';
@@ -314,6 +314,7 @@ const Forms = {
             ${field.options.map(opt => `<option value="${opt.value}" ${String(value) === String(opt.value) ? 'selected' : ''}>${opt.label}</option>`).join('')}
           </select>`;
       } else {
+        const datalistHtml = field.suggestFrom ? await this._buildDatalist(field) : '';
         inputHtml = `<input
           type="${field.type}"
           class="form-control"
@@ -326,7 +327,7 @@ const Forms = {
           ${field.suggestFrom ? `list="datalist-${field.name}"` : ''}
           ${isRequired ? 'required' : ''}
         >
-        ${field.suggestFrom ? this._buildDatalist(field) : ''}`;
+        ${datalistHtml}`;
       }
 
       const hintText = (field.requiredOnCreateOnly && this.currentId && field.editHint) ? field.editHint : field.hint;
@@ -337,7 +338,9 @@ const Forms = {
           ${inputHtml}
           ${hintText ? `<small class="form-text text-muted">${hintText}</small>` : ''}
         </div>`;
-    }).join('') + `</div>`;
+    }));
+
+    return `<div class="row g-3">` + fieldsHtml.join('') + `</div>`;
   },
 
   /**
@@ -345,10 +348,10 @@ const Forms = {
    * الحقل عبر سجلات نفس الكيان - اقتراح فقط وليس قيدًا (المستخدم يقدر يكتب
    * أي قيمة جديدة يريدها بحرية تامة)
    */
-  _buildDatalist(field) {
+  async _buildDatalist(field) {
     let values = [];
     try {
-      const items = DataStore.list(this.currentSchema.entity);
+      const items = await DataStore.list(this.currentSchema.entity);
       values = [...new Set(items.map(i => i[field.suggestFrom]).filter(Boolean))];
     } catch (e) { /* تجاهل لو الكيان غير متاح بعد */ }
 
@@ -442,16 +445,16 @@ const Forms = {
         // لتسجيل الدخول به، لذلك لا نخزّن كلمة المرور محليًا إطلاقًا
         delete data.password;
         if (isEditing) {
-          DataStore.update(entity, this.currentId, data);
+          await DataStore.update(entity, this.currentId, data);
         } else {
-          DataStore.create(entity, data);
+          await DataStore.create(entity, data);
         }
         UI.showToast('تم الحفظ في وضع العرض التجريبي فقط. لتفعيل تسجيل دخول حقيقي، اربط رابط Apps Script من الإعدادات.', 'warning');
       } else if (isEditing) {
-        DataStore.update(entity, this.currentId, data);
+        await DataStore.update(entity, this.currentId, data);
         UI.showToast('تم تحديث البيانات بنجاح', 'success');
       } else {
-        DataStore.create(entity, data);
+        await DataStore.create(entity, data);
         UI.showToast('تمت الإضافة بنجاح', 'success');
       }
     } catch (error) {
@@ -460,7 +463,7 @@ const Forms = {
     }
 
     this.modalInstance.hide();
-    this._refreshCurrentPage();
+    await this._refreshCurrentPage();
   },
 
   /**
@@ -474,22 +477,22 @@ const Forms = {
     if (!confirmed) return;
 
     try {
-      DataStore.delete(schema.entity, id);
+      await DataStore.delete(schema.entity, id);
       UI.showToast('تم الحذف بنجاح', 'success');
     } catch (error) {
       UI.showToast(error.message || 'حدث خطأ غير متوقع أثناء الحذف', 'error');
       return;
     }
 
-    this._refreshCurrentPage();
+    await this._refreshCurrentPage();
   },
 
   /**
    * إعادة رسم الصفحة الحالية لتعكس أحدث البيانات
    */
-  _refreshCurrentPage() {
+  async _refreshCurrentPage() {
     if (typeof Router !== 'undefined' && Router.currentPage) {
-      Router.loadPage(Router.currentPage);
+      await Router.loadPage(Router.currentPage);
     }
   }
 };

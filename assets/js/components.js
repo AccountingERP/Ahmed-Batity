@@ -7,11 +7,11 @@ const Components = {
   // ====================
   // Dashboard
   // ====================
-  renderDashboard() {
+  async renderDashboard() {
     const todayStr = new Date().toISOString().slice(0, 10);
-    const sales = DataStore.list('sales');
-    const expenses = DataStore.list('expenses');
-    const income = DataStore.list('income');
+    const sales = await DataStore.list('sales');
+    const expenses = await DataStore.list('expenses');
+    const income = await DataStore.list('income');
 
     const todaySales = sales
       .filter(s => (s.date || '').slice(0, 10) === todayStr)
@@ -133,7 +133,7 @@ const Components = {
    * يجب استدعاؤها من Router بعد إدراج renderDashboard() في الصفحة عبر innerHTML،
    * لأن وسوم <script> المُدرجة عبر innerHTML لا تُنفَّذها المتصفحات إطلاقًا.
    */
-  initDashboardCharts() {
+  async initDashboardCharts() {
     const salesLabels = ['1', '5', '10', '15', '20', '25', '30'];
     const salesData = [0, 0, 0, 0, 0, 0, 0];
 
@@ -169,7 +169,7 @@ const Components = {
       });
     }
 
-    this._renderCategoryChart();
+    await this._renderCategoryChart();
   },
 
   /**
@@ -177,11 +177,11 @@ const Components = {
    * المستخدم بنفسه (حقل نصي حر في نموذج المنتج)، وليس من قائمة ثابتة.
    * القيمة المعروضة لكل فئة = مجموع (السعر × الكمية) لكل منتجاتها.
    */
-  _renderCategoryChart() {
+  async _renderCategoryChart() {
     const pieCtx = document.getElementById('salesPieChart');
     if (!pieCtx) return;
 
-    const products = DataStore.list('products');
+    const products = await DataStore.list('products');
     const totalsByCategory = {};
 
     products.forEach(p => {
@@ -228,8 +228,8 @@ const Components = {
   // ====================
   // Customers
   // ====================
-  renderCustomers() {
-    const rows = DataStore.list('customers').map(c => [
+  async renderCustomers() {
+    const rows = (await DataStore.list('customers')).map(c => [
       c.id,
       Utils.sanitizeHtml(c.name),
       Utils.sanitizeHtml(c.email) || '-',
@@ -251,8 +251,8 @@ const Components = {
   // ====================
   // Suppliers
   // ====================
-  renderSuppliers() {
-    const rows = DataStore.list('suppliers').map(s => [
+  async renderSuppliers() {
+    const rows = (await DataStore.list('suppliers')).map(s => [
       s.id,
       Utils.sanitizeHtml(s.name),
       Utils.sanitizeHtml(s.email) || '-',
@@ -274,8 +274,8 @@ const Components = {
   // ====================
   // Products
   // ====================
-  renderProducts() {
-    const rows = DataStore.list('products').map(p => [
+  async renderProducts() {
+    const rows = (await DataStore.list('products')).map(p => [
       p.id,
       '<div class="avatar avatar-sm avatar-primary"><i class="fas fa-box"></i></div>',
       Utils.sanitizeHtml(p.name),
@@ -298,8 +298,8 @@ const Components = {
   // ====================
   // Inventory
   // ====================
-  renderInventory() {
-    const rows = DataStore.list('products').map(p => [
+  async renderInventory() {
+    const rows = (await DataStore.list('products')).map(p => [
       p.id,
       Utils.sanitizeHtml(p.name),
       'المستودع الرئيسي',
@@ -321,8 +321,8 @@ const Components = {
   // ====================
   // Sales
   // ====================
-  renderSales() {
-    const rows = DataStore.list('sales').map(s => [
+  async renderSales() {
+    const rows = (await DataStore.list('sales')).map(s => [
       s.id,
       Utils.sanitizeHtml(s.invoiceNumber),
       Utils.sanitizeHtml(s.customerName),
@@ -344,8 +344,8 @@ const Components = {
   // ====================
   // Sales Returns
   // ====================
-  renderSalesReturns() {
-    const rows = DataStore.list('salesReturns').map(r => [
+  async renderSalesReturns() {
+    const rows = (await DataStore.list('salesReturns')).map(r => [
       r.id,
       Utils.sanitizeHtml(r.returnNumber),
       Utils.sanitizeHtml(r.customerName),
@@ -367,8 +367,8 @@ const Components = {
   // ====================
   // Purchases
   // ====================
-  renderPurchases() {
-    const rows = DataStore.list('purchases').map(p => [
+  async renderPurchases() {
+    const rows = (await DataStore.list('purchases')).map(p => [
       p.id,
       Utils.sanitizeHtml(p.invoiceNumber),
       Utils.sanitizeHtml(p.supplierName),
@@ -390,8 +390,8 @@ const Components = {
   // ====================
   // Purchase Returns
   // ====================
-  renderPurchaseReturns() {
-    const rows = DataStore.list('purchaseReturns').map(r => [
+  async renderPurchaseReturns() {
+    const rows = (await DataStore.list('purchaseReturns')).map(r => [
       r.id,
       Utils.sanitizeHtml(r.returnNumber),
       Utils.sanitizeHtml(r.supplierName),
@@ -413,8 +413,8 @@ const Components = {
   // ====================
   // Expenses
   // ====================
-  renderExpenses() {
-    const rows = DataStore.list('expenses').map(e => [
+  async renderExpenses() {
+    const rows = (await DataStore.list('expenses')).map(e => [
       e.id,
       Utils.formatDate(e.date),
       Utils.sanitizeHtml(e.category),
@@ -435,8 +435,8 @@ const Components = {
   // ====================
   // Income
   // ====================
-  renderIncome() {
-    const rows = DataStore.list('income').map(i => [
+  async renderIncome() {
+    const rows = (await DataStore.list('income')).map(i => [
       i.id,
       Utils.formatDate(i.date),
       Utils.sanitizeHtml(i.category),
@@ -457,8 +457,8 @@ const Components = {
   // ====================
   // Employees
   // ====================
-  renderEmployees() {
-    const rows = DataStore.list('employees').map(e => [
+  async renderEmployees() {
+    const rows = (await DataStore.list('employees')).map(e => [
       e.id,
       Utils.sanitizeHtml(e.name),
       Utils.sanitizeHtml(e.department),
@@ -480,13 +480,15 @@ const Components = {
   // ====================
   // Attendance
   // ====================
-  renderAttendance() {
-    const employees = DataStore.list('employees');
+  async renderAttendance() {
+    const employees = await DataStore.list('employees');
     const hasEmployees = employees.length > 0;
 
     const employeeOptions = employees
       .map(e => `<option value="${e.id}">${Utils.sanitizeHtml(e.name)}</option>`)
       .join('');
+
+    const attendanceTableHtml = await this.renderAttendanceTable();
 
     return `
       <div class="page-header" data-aos="fade-down">
@@ -528,7 +530,7 @@ const Components = {
         </div>
         <div class="card-body">
           <div class="data-grid" id="attendance-table-container">
-            ${this.renderAttendanceTable()}
+            ${attendanceTableHtml}
           </div>
         </div>
       </div>
@@ -538,11 +540,11 @@ const Components = {
   /**
    * يبني جدول سجل الحضور بناءً على فلتر التاريخ الحالي
    */
-  renderAttendanceTable() {
+  async renderAttendanceTable() {
     const dateInput = document.getElementById('attendance-date-filter');
     const filterDate = dateInput ? dateInput.value : '';
 
-    let records = DataStore.list('attendance');
+    let records = await DataStore.list('attendance');
     if (filterDate) {
       records = records.filter(r => r.date === filterDate);
     }
@@ -576,15 +578,15 @@ const Components = {
     `;
   },
 
-  refreshAttendanceTable() {
+  async refreshAttendanceTable() {
     const container = document.getElementById('attendance-table-container');
-    if (container) container.innerHTML = this.renderAttendanceTable();
+    if (container) container.innerHTML = await this.renderAttendanceTable();
   },
 
-  resetAttendanceFilter() {
+  async resetAttendanceFilter() {
     const dateInput = document.getElementById('attendance-date-filter');
     if (dateInput) dateInput.value = '';
-    this.refreshAttendanceTable();
+    await this.refreshAttendanceTable();
   },
 
   _calcWorkHours(checkIn, checkOut) {
@@ -595,10 +597,10 @@ const Components = {
     return `${hours.toFixed(1)} ساعة`;
   },
 
-  _selectedEmployee() {
+  async _selectedEmployee() {
     const select = document.getElementById('attendance-employee-select');
     if (!select || !select.value) return null;
-    const employees = DataStore.list('employees');
+    const employees = await DataStore.list('employees');
     return employees.find(e => String(e.id) === String(select.value)) || null;
   },
 
@@ -606,15 +608,15 @@ const Components = {
     return new Date().toISOString().slice(0, 10);
   },
 
-  attendanceCheckIn() {
-    const employee = this._selectedEmployee();
+  async attendanceCheckIn() {
+    const employee = await this._selectedEmployee();
     if (!employee) {
       UI.showToast('اختر الموظف أولًا', 'warning');
       return;
     }
 
     const today = this._todayISO();
-    const existing = DataStore.list('attendance').find(
+    const existing = (await DataStore.list('attendance')).find(
       r => String(r.employeeId) === String(employee.id) && r.date === today
     );
 
@@ -624,7 +626,7 @@ const Components = {
     }
 
     try {
-      DataStore.create('attendance', {
+      await DataStore.create('attendance', {
         employeeId: employee.id,
         employeeName: employee.name,
         date: today,
@@ -632,21 +634,21 @@ const Components = {
         checkOut: null
       });
       UI.showToast(`تم تسجيل حضور ${employee.name}`, 'success');
-      this.refreshAttendanceTable();
+      await this.refreshAttendanceTable();
     } catch (error) {
       UI.showToast(error.message || 'حدث خطأ أثناء تسجيل الحضور', 'error');
     }
   },
 
-  attendanceCheckOut() {
-    const employee = this._selectedEmployee();
+  async attendanceCheckOut() {
+    const employee = await this._selectedEmployee();
     if (!employee) {
       UI.showToast('اختر الموظف أولًا', 'warning');
       return;
     }
 
     const today = this._todayISO();
-    const existing = DataStore.list('attendance').find(
+    const existing = (await DataStore.list('attendance')).find(
       r => String(r.employeeId) === String(employee.id) && r.date === today
     );
 
@@ -661,9 +663,9 @@ const Components = {
     }
 
     try {
-      DataStore.update('attendance', existing.id, { checkOut: new Date().toISOString() });
+      await DataStore.update('attendance', existing.id, { checkOut: new Date().toISOString() });
       UI.showToast(`تم تسجيل انصراف ${employee.name}`, 'success');
-      this.refreshAttendanceTable();
+      await this.refreshAttendanceTable();
     } catch (error) {
       UI.showToast(error.message || 'حدث خطأ أثناء تسجيل الانصراف', 'error');
     }
@@ -672,8 +674,8 @@ const Components = {
   // ====================
   // Tasks
   // ====================
-  renderTasks() {
-    const tasks = DataStore.list('tasks');
+  async renderTasks() {
+    const tasks = await DataStore.list('tasks');
 
     const renderCard = (t) => `
       <div class="kanban-card">
@@ -742,11 +744,13 @@ const Components = {
   // ====================
   // Calendar
   // ====================
-  renderCalendar() {
+  async renderCalendar() {
     if (!this._calendarState) {
       const now = new Date();
       this._calendarState = { year: now.getFullYear(), month: now.getMonth() };
     }
+
+    const calendarWidgetHtml = await this.renderCalendarWidget();
 
     return `
       <div class="page-header" data-aos="fade-down">
@@ -759,7 +763,7 @@ const Components = {
       </div>
 
       <div id="calendar-widget-container">
-        ${this.renderCalendarWidget()}
+        ${calendarWidgetHtml}
       </div>
     `;
   },
@@ -768,12 +772,12 @@ const Components = {
    * يبني عنصر التقويم فقط (رأس الشهر + الشبكة) بناءً على _calendarState الحالي،
    * لإعادة رسمه جزئيًا عند التنقل بين الشهور بدل إعادة تحميل الصفحة كاملة
    */
-  renderCalendarWidget() {
+  async renderCalendarWidget() {
     const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
     const { year, month } = this._calendarState;
     const today = new Date();
 
-    const events = DataStore.list('calendarEvents');
+    const events = await DataStore.list('calendarEvents');
     const eventsByDay = {};
     events.forEach(ev => {
       if (!ev.date) return;
@@ -839,7 +843,7 @@ const Components = {
     `;
   },
 
-  navigateCalendarMonth(delta) {
+  async navigateCalendarMonth(delta) {
     if (!this._calendarState) {
       const now = new Date();
       this._calendarState = { year: now.getFullYear(), month: now.getMonth() };
@@ -851,13 +855,13 @@ const Components = {
     this._calendarState = { year, month };
 
     const container = document.getElementById('calendar-widget-container');
-    if (container) container.innerHTML = this.renderCalendarWidget();
+    if (container) container.innerHTML = await this.renderCalendarWidget();
   },
 
   // ====================
   // Reports
   // ====================
-  renderReports() {
+  async renderReports() {
     return `
       <div class="page-header" data-aos="fade-down">
         <h2><i class="fas fa-file-alt me-2"></i>التقارير</h2>
@@ -931,9 +935,9 @@ const Components = {
   // ====================
   // Financial Report (يجمع الإيرادات والمصروفات في عرض واحد)
   // ====================
-  renderFinancialReport() {
-    const expenses = DataStore.list('expenses');
-    const income = DataStore.list('income');
+  async renderFinancialReport() {
+    const expenses = await DataStore.list('expenses');
+    const income = await DataStore.list('income');
 
     const totalExpenses = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
     const totalIncome = income.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
@@ -1002,7 +1006,7 @@ const Components = {
   // ====================
   // Settings
   // ====================
-  renderSettings() {
+  async renderSettings() {
     const settings = this.loadSettings();
 
     return `
@@ -1140,7 +1144,7 @@ const Components = {
     CONFIG.DATE.DISPLAY_FORMAT = settings.dateFormat;
   },
 
-  saveSettings() {
+  async saveSettings() {
     const email = document.getElementById('setting-company-email').value.trim();
     if (email && !Utils.isValidEmail(email)) {
       UI.showToast('صيغة البريد الإلكتروني غير صحيحة', 'error');
@@ -1163,7 +1167,7 @@ const Components = {
     UI.showToast('تم حفظ الإعدادات بنجاح', 'success');
   },
 
-  saveBackupSettings() {
+  async saveBackupSettings() {
     const current = this.loadSettings();
     const updated = Object.assign({}, current, {
       autoBackupEnabled: document.getElementById('setting-auto-backup-enabled').checked,
@@ -1178,7 +1182,7 @@ const Components = {
    * فحص دوري بسيط (يُستدعى عند بدء تشغيل التطبيق) لتنفيذ نسخة احتياطية
    * تلقائية لو كانت مفعّلة والوقت المحدد بحسب التكرار قد حان
    */
-  checkAutoBackup() {
+  async checkAutoBackup() {
     const settings = this.loadSettings();
     if (!settings.autoBackupEnabled) return;
 
@@ -1189,11 +1193,11 @@ const Components = {
     if (Date.now() - last < interval) return;
 
     try {
-      const payload = this._gatherBackupData();
+      const payload = await this._gatherBackupData();
       const json = JSON.stringify(payload);
       const sizeKB = (new Blob([json]).size / 1024).toFixed(1);
 
-      DataStore.create('backups', { type: 'تلقائي', status: 'مكتمل', sizeKB, payload: json });
+      await DataStore.create('backups', { type: 'تلقائي', status: 'مكتمل', sizeKB, payload: json });
 
       const updated = Object.assign({}, settings, { lastAutoBackup: new Date().toISOString() });
       Utils.storage.set('erp_settings', updated);
@@ -1205,8 +1209,8 @@ const Components = {
   // ====================
   // Users
   // ====================
-  renderUsers() {
-    const rows = DataStore.list('users').map(u => [
+  async renderUsers() {
+    const rows = (await DataStore.list('users')).map(u => [
       u.id,
       Utils.sanitizeHtml(u.name),
       Utils.sanitizeHtml(u.email),
@@ -1228,7 +1232,8 @@ const Components = {
   // ====================
   // Backup
   // ====================
-  renderBackup() {
+  async renderBackup() {
+    const backupTableHtml = await this.renderBackupTable();
     return `
       <div class="page-header" data-aos="fade-down">
         <h2><i class="fas fa-cloud-upload-alt me-2"></i>النسخ الاحتياطي</h2>
@@ -1245,9 +1250,9 @@ const Components = {
 
       <div class="alert alert-info" data-aos="fade-up">
         <i class="fas fa-info-circle"></i>
-        النسخة الاحتياطية تشمل كل بيانات النظام المخزّنة محليًا في هذا المتصفح
-        (العملاء، الموردين، المنتجات، الفواتير، المصروفات، الإيرادات، الموظفين، المهام...)
-        وتُحفظ كملف JSON على جهازك، بالإضافة لسجلها هنا حتى تقدر تعيد تنزيلها لاحقًا.
+        النسخة الاحتياطية تشمل كل بيانات النظام (العملاء، الموردين، المنتجات،
+        الفواتير، المصروفات، الإيرادات، الموظفين، المهام...) وتُحفظ كملف JSON
+        على جهازك، بالإضافة لسجلها هنا حتى تقدر تعيد تنزيلها لاحقًا.
       </div>
 
       <div class="card" data-aos="fade-up">
@@ -1256,15 +1261,15 @@ const Components = {
         </div>
         <div class="card-body">
           <div class="data-grid" id="backup-table-container">
-            ${this.renderBackupTable()}
+            ${backupTableHtml}
           </div>
         </div>
       </div>
     `;
   },
 
-  renderBackupTable() {
-    const backups = DataStore.list('backups').slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  async renderBackupTable() {
+    const backups = (await DataStore.list('backups')).slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const hasRows = backups.length > 0;
 
     const rowsHtml = hasRows
@@ -1294,51 +1299,52 @@ const Components = {
     `;
   },
 
-  refreshBackupTable() {
+  async refreshBackupTable() {
     const container = document.getElementById('backup-table-container');
-    if (container) container.innerHTML = this.renderBackupTable();
+    if (container) container.innerHTML = await this.renderBackupTable();
   },
 
   /**
    * يجمع كل بيانات النظام المخزّنة محليًا (باستثناء النسخ الاحتياطية نفسها
    * وسجل النشاط، تفاديًا لتضخيم النسخة بلا داعٍ)
    */
-  _gatherBackupData() {
+  async _gatherBackupData() {
     const excluded = ['backups', 'activityLogs'];
     const data = {};
-    Object.values(DataStore.ENTITIES).forEach(entity => {
-      if (excluded.includes(entity)) return;
-      data[entity] = DataStore.list(entity);
-    });
+    for (const entity of Object.values(DataStore.ENTITIES)) {
+      if (excluded.includes(entity)) continue;
+      data[entity] = await DataStore.list(entity);
+    }
     return {
       meta: { exportedAt: new Date().toISOString(), app: 'Ahmed Batity ERP' },
       data
     };
   },
 
-  createBackup() {
+  async createBackup() {
     try {
-      const payload = this._gatherBackupData();
+      const payload = await this._gatherBackupData();
       const json = JSON.stringify(payload);
       const sizeKB = (new Blob([json]).size / 1024).toFixed(1);
 
-      const record = DataStore.create('backups', {
+      const record = await DataStore.create('backups', {
         type: 'يدوي',
         status: 'مكتمل',
         sizeKB,
         payload: json
       });
 
-      this._downloadJson(json, `ahmed-batity-erp-backup-${this._todayISO()}.json`);
+      const todayStr = await this._todayISO();
+      this._downloadJson(json, `ahmed-batity-erp-backup-${todayStr}.json`);
       UI.showToast('تم إنشاء نسخة احتياطية جديدة بنجاح', 'success');
-      this.refreshBackupTable();
+      await this.refreshBackupTable();
     } catch (error) {
       UI.showToast(error.message || 'حدث خطأ أثناء إنشاء النسخة الاحتياطية', 'error');
     }
   },
 
-  downloadBackupRecord(id) {
-    const record = DataStore.get('backups', id);
+  async downloadBackupRecord(id) {
+    const record = await DataStore.get('backups', id);
     if (!record || !record.payload) {
       UI.showToast('تعذّر العثور على محتوى هذه النسخة', 'error');
       return;
@@ -1350,8 +1356,8 @@ const Components = {
     const confirmed = await UI.confirm('تأكيد الحذف', 'هل أنت متأكد من حذف هذه النسخة الاحتياطية من السجل؟');
     if (!confirmed) return;
 
-    DataStore.delete('backups', id);
-    this.refreshBackupTable();
+    await DataStore.delete('backups', id);
+    await this.refreshBackupTable();
     UI.showToast('تم حذف النسخة الاحتياطية', 'success');
   },
 
@@ -1407,8 +1413,9 @@ const Components = {
   // ====================
   // Logs
   // ====================
-  renderLogs() {
+  async renderLogs() {
     const canClear = typeof Auth !== 'undefined' && Auth.hasPermission('logs', CONFIG.PERMISSIONS.DELETE);
+    const logsTableHtml = await this.renderLogsTable();
 
     return `
       <div class="page-header" data-aos="fade-down">
@@ -1442,7 +1449,7 @@ const Components = {
         </div>
         <div class="card-body">
           <div class="data-grid" id="logs-table-container">
-            ${this.renderLogsTable()}
+            ${logsTableHtml}
           </div>
         </div>
       </div>
@@ -1452,7 +1459,7 @@ const Components = {
   /**
    * يبني جدول سجل النشاط بناءً على الفلاتر الحالية (يُستخدم للعرض الأول وإعادة التحديث)
    */
-  renderLogsTable() {
+  async renderLogsTable() {
     const dateInput = document.getElementById('logs-date-filter');
     const typeInput = document.getElementById('logs-type-filter');
 
@@ -1497,20 +1504,20 @@ const Components = {
   /**
    * إعادة رسم جدول السجل فقط (بدون إعادة تحميل الصفحة) عند تغيير الفلاتر
    */
-  refreshLogsTable() {
+  async refreshLogsTable() {
     const container = document.getElementById('logs-table-container');
-    if (container) container.innerHTML = this.renderLogsTable();
+    if (container) container.innerHTML = await this.renderLogsTable();
   },
 
   /**
    * إعادة تعيين الفلاتر وعرض كل السجلات
    */
-  resetLogsFilter() {
+  async resetLogsFilter() {
     const dateInput = document.getElementById('logs-date-filter');
     const typeInput = document.getElementById('logs-type-filter');
     if (dateInput) dateInput.value = '';
     if (typeInput) typeInput.value = '';
-    this.refreshLogsTable();
+    await this.refreshLogsTable();
   },
 
   /**
@@ -1521,7 +1528,7 @@ const Components = {
     if (!confirmed) return;
 
     if (typeof Logger !== 'undefined') Logger.clear();
-    this.refreshLogsTable();
+    await this.refreshLogsTable();
     UI.showToast('تم حذف السجلات', 'success');
   },
 
@@ -1613,7 +1620,7 @@ const Components = {
    * يطبّق فلاتر الحالة/التاريخ الحاليتين على البيانات الكاملة المخزّنة
    * في _currentGrid ويعيد رسم الجدول فقط (بدون تعديل rows الأصلية)
    */
-  refreshGridFilter() {
+  async refreshGridFilter() {
     if (!this._currentGrid) return;
 
     const { columns, rows } = this._currentGrid;
@@ -1644,18 +1651,18 @@ const Components = {
     if (container) container.innerHTML = this.renderGridTable(filtered);
   },
 
-  resetGridFilter() {
+  async resetGridFilter() {
     const statusFilter = document.getElementById('grid-status-filter');
     const dateFilter = document.getElementById('grid-date-filter');
     if (statusFilter) statusFilter.value = '';
     if (dateFilter) dateFilter.value = '';
-    this.refreshGridFilter();
+    await this.refreshGridFilter();
   },
 
   /**
    * ينفّذ تصدير الجدول المعروض حاليًا بالصيغة المطلوبة (excel/pdf)
    */
-  exportCurrentGrid(format) {
+  async exportCurrentGrid(format) {
     if (!this._currentGrid) {
       UI.showToast('لا يوجد جدول لتصديره حاليًا', 'warning');
       return;
@@ -1673,7 +1680,7 @@ const Components = {
   /**
    * تصدير بيانات رسم "مبيعات الشهر" في لوحة التحكم
    */
-  exportSalesChart(format) {
+  async exportSalesChart(format) {
     if (!this._salesChartData) {
       UI.showToast('لا توجد بيانات لتصديرها حاليًا', 'warning');
       return;

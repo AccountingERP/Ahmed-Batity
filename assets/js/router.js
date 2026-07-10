@@ -114,7 +114,7 @@ const Router = {
 
       // تهيئة رسوم لوحة التحكم البيانية (لا يمكن تنفيذها كـ<script> داخل innerHTML)
       if (page === 'dashboard') {
-        Components.initDashboardCharts();
+        await Components.initDashboardCharts();
       }
 
       // Initialize AOS animations
@@ -140,39 +140,38 @@ const Router = {
       return await response.text();
     } catch (error) {
       // Fallback: render inline page
-      return this.renderInlinePage(page);
+      return await this.renderInlinePage(page);
     }
   },
 
   /**
    * Render inline page (fallback)
    */
-  renderInlinePage(page) {
-    const pages = {
-      dashboard: Components.renderDashboard(),
-      customers: Components.renderCustomers(),
-      suppliers: Components.renderSuppliers(),
-      products: Components.renderProducts(),
-      inventory: Components.renderInventory(),
-      sales: Components.renderSales(),
-      'sales-returns': Components.renderSalesReturns(),
-      purchases: Components.renderPurchases(),
-      'purchase-returns': Components.renderPurchaseReturns(),
-      expenses: Components.renderExpenses(),
-      income: Components.renderIncome(),
-      employees: Components.renderEmployees(),
-      attendance: Components.renderAttendance(),
-      tasks: Components.renderTasks(),
-      calendar: Components.renderCalendar(),
-      reports: Components.renderReports(),
-      'financial-report': Components.renderFinancialReport(),
-      settings: Components.renderSettings(),
-      users: Components.renderUsers(),
-      backup: Components.renderBackup(),
-      logs: Components.renderLogs()
-    };
-
-    return pages[page] || Components.renderNotFound();
+  async renderInlinePage(page) {
+    switch (page) {
+      case 'dashboard': return await Components.renderDashboard();
+      case 'customers': return await Components.renderCustomers();
+      case 'suppliers': return await Components.renderSuppliers();
+      case 'products': return await Components.renderProducts();
+      case 'inventory': return await Components.renderInventory();
+      case 'sales': return await Components.renderSales();
+      case 'sales-returns': return await Components.renderSalesReturns();
+      case 'purchases': return await Components.renderPurchases();
+      case 'purchase-returns': return await Components.renderPurchaseReturns();
+      case 'expenses': return await Components.renderExpenses();
+      case 'income': return await Components.renderIncome();
+      case 'employees': return await Components.renderEmployees();
+      case 'attendance': return await Components.renderAttendance();
+      case 'tasks': return await Components.renderTasks();
+      case 'calendar': return await Components.renderCalendar();
+      case 'reports': return await Components.renderReports();
+      case 'financial-report': return await Components.renderFinancialReport();
+      case 'settings': return await Components.renderSettings();
+      case 'users': return await Components.renderUsers();
+      case 'backup': return await Components.renderBackup();
+      case 'logs': return await Components.renderLogs();
+      default: return Components.renderNotFound();
+    }
   },
 
   /**

@@ -61,29 +61,27 @@ const GlobalSearch = {
     });
   },
 
-  _handleInput() {
+  async _handleInput() {
     const query = this.input.value.trim();
     if (query.length < this.MIN_CHARS) {
       this._renderHint();
       return;
     }
-    const groups = this._search(query);
+    const groups = await this._search(query);
     this._render(groups, query);
   },
 
-  _search(query) {
+  async _search(query) {
     const lowerQuery = query.toLowerCase();
-    const groups = [];
 
-    this.SOURCES.forEach(source => {
-      // احترام صلاحيات المستخدم: لا يظهر بحث في قسم مالوش صلاحية عرضه أصلًا
-      if (typeof Auth !== 'undefined' && !Auth.hasPermission(source.module, CONFIG.PERMISSIONS.VIEW)) {
-        return;
-      }
+    const allowedSources = this.SOURCES.filter(source => {
+      return !(typeof Auth !== 'undefined' && !Auth.hasPermission(source.module, CONFIG.PERMISSIONS.VIEW));
+    });
 
+    const groupsResults = await Promise.all(allowedSources.map(async source => {
       let items;
       try {
-        items = DataStore.list(source.entity) || [];
+        items = (await DataStore.list(source.entity)) || [];
       } catch (e) {
         items = [];
       }
@@ -95,12 +93,10 @@ const GlobalSearch = {
         })
       ).slice(0, this.MAX_RESULTS_PER_GROUP);
 
-      if (matches.length > 0) {
-        groups.push({ source, matches });
-      }
-    });
+      return matches.length > 0 ? { source, matches } : null;
+    }));
 
-    return groups;
+    return groupsResults.filter(Boolean);
   },
 
   _render(groups, query) {
@@ -166,9 +162,9 @@ const GlobalSearch = {
     Router.navigate(module);
 
     // فتح نموذج التعديل مباشرة على نفس العنصر بعد رسم الصفحة
-    setTimeout(() => {
+    setTimeout(async () => {
       if (typeof Forms !== 'undefined' && Forms.schemas && Forms.schemas[entity]) {
-        Forms.openEdit(entity, id);
+        await Forms.openEdit(entity, id);
       }
     }, 150);
   },

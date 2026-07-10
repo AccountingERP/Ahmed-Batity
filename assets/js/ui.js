@@ -132,8 +132,8 @@ const UI = {
     }
 
     if (markAllRead) {
-      markAllRead.addEventListener('click', () => {
-        this.markAllNotificationsRead();
+      markAllRead.addEventListener('click', async () => {
+        await this.markAllNotificationsRead();
       });
     }
   },
@@ -360,12 +360,13 @@ const UI = {
    * منتجات منخفضة المخزون، مهام متأخرة، وآخر عمليات في سجل النشاط.
    * كل إشعار له "توقيع" (signature) ثابت يُستخدم لتتبع حالة القراءة.
    */
-  _buildNotifications() {
+  async _buildNotifications() {
     const notifications = [];
 
     // منتجات منخفضة المخزون (نفس الحد المستخدم في صفحة المخزون: 5 قطع)
     try {
-      const lowStockProducts = DataStore.list('products').filter(p => (p.quantity ?? 0) <= 5);
+      const products = await DataStore.list('products');
+      const lowStockProducts = products.filter(p => (p.quantity ?? 0) <= 5);
       lowStockProducts.slice(0, 5).forEach(p => {
         notifications.push({
           signature: `low-stock-${p.id}`,
@@ -379,7 +380,8 @@ const UI = {
     // مهام متأخرة عن موعدها ولم تُنجز بعد
     try {
       const now = new Date();
-      const overdueTasks = DataStore.list('tasks').filter(t =>
+      const tasks = await DataStore.list('tasks');
+      const overdueTasks = tasks.filter(t =>
         t.dueDate && new Date(t.dueDate) < now && t.status !== 'completed' && t.status !== 'done'
       );
       overdueTasks.slice(0, 5).forEach(t => {
@@ -422,7 +424,7 @@ const UI = {
   async loadNotifications() {
     const list = document.getElementById('notifications-list');
 
-    const notifications = this._buildNotifications();
+    const notifications = await this._buildNotifications();
     const readSignatures = this._readNotificationSignatures();
     const unreadCount = notifications.filter(n => !readSignatures.includes(n.signature)).length;
 
@@ -461,8 +463,8 @@ const UI = {
   /**
    * Mark all notifications as read (تُحفظ الحالة فعليًا حتى تبقى مقروءة بعد إعادة الفتح)
    */
-  markAllNotificationsRead() {
-    const notifications = this._buildNotifications();
+  async markAllNotificationsRead() {
+    const notifications = await this._buildNotifications();
     const signatures = notifications.map(n => n.signature);
 
     Utils.storage.set('erp_read_notifications', signatures);

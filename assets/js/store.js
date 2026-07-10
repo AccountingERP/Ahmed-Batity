@@ -1,11 +1,15 @@
 /* =========================================
-   Ahmed Batity ERP - Local Data Store
+   Ahmed Batity ERP - Data Store (نسخة حقيقية)
    =========================================
-   طبقة بيانات مؤقتة تعمل عبر LocalStorage.
-   تُستخدم عندما لا يكون رابط الـ API الحقيقي (Google Apps Script) مهيأً بعد،
-   حتى تعمل شاشات الإضافة/التعديل/الحذف فعلياً من الآن.
-   عند ربط الـ API الحقيقي لاحقاً، يمكن استبدال هذه الطبقة بسهولة
-   لأن كل الاستدعاءات تمر من هنا فقط.
+   طبقة وسيطة توحّد كل عمليات القراءة/الكتابة عبر الـ API الحقيقي
+   (Google Apps Script)، بدل LocalStorage. كل الشاشات (components.js,
+   forms.js, ui.js...) تستدعي DataStore.list/get/create/update/delete
+   بنفس الطريقة القديمة، لكنها الآن async وترجع Promise فعليًا متصلًا
+   بالخادم، فتتشارك نفس البيانات بين كل المستخدمين والأجهزة والجلسات.
+
+   ملاحظة: لو رابط الـ API غير مهيأ (وضع تجريبي بدون خادم)، تُستخدم
+   نسخة احتياطية بسيطة عبر LocalStorage حتى لا تنكسر الواجهة بالكامل،
+   لكنها غير مخصّصة للاستخدام الفعلي/الإنتاجي.
    ========================================= */
 
 const DataStore = {
@@ -15,6 +19,7 @@ const DataStore = {
     customers: 'customers',
     suppliers: 'suppliers',
     products: 'products',
+    inventory: 'inventory',
     sales: 'sales',
     salesReturns: 'salesReturns',
     purchases: 'purchases',
@@ -30,27 +35,156 @@ const DataStore = {
   },
 
   /**
+   * خريطة: اسم الـ entity (كما تستخدمه الشاشات) → اسم الكائن المطابق
+   * في API (assets/js/api.js). مصدر الحقيقة الوحيد لهذا الربط.
+   */
+  API_MAP: {
+    customers: 'customers',
+    suppliers: 'suppliers',
+    products: 'products',
+    inventory: 'inventory',
+    sales: 'sales',
+    salesReturns: 'salesReturns',
+    purchases: 'purchases',
+    purchaseReturns: 'purchaseReturns',
+    expenses: 'expenses',
+    income: 'income',
+    employees: 'employees',
+    attendance: 'attendance',
+    calendarEvents: 'calendarEvents',
+    tasks: 'tasks',
+    users: 'users'
+  },
+
+  /**
    * هل يوجد رابط API حقيقي مهيأ؟
    */
   isApiConfigured() {
-    return CONFIG.API.BASE_URL && !CONFIG.API.BASE_URL.includes('YOUR_SCRIPT_ID');
+    return !!(CONFIG.API.BASE_URL && !CONFIG.API.BASE_URL.includes('YOUR_SCRIPT_ID'));
   },
 
   _key(entity) {
     return CONFIG.STORAGE.ENTITY_DATA_PREFIX + entity;
   },
 
-  list(entity) {
+  _apiEntity(entity) {
+    const apiKey = this.API_MAP[entity];
+    return apiKey ? API[apiKey] : null;
+  },
+
+  /**
+   * يجلب قائمة سجلات الكيان المطلوب.
+   * @returns {Promise<Array>}
+   */
+  async list(entity) {
+    if (this.isApiConfigured() && this._apiEntity(entity)) {
+      try {
+        const response = await this._apiEntity(entity).list();
+        return (response && response.data) || [];
+      } catch (error) {
+        console.error(`DataStore.list(${entity}) API error:`, error);
+        if (typeof UI !== 'undefined') {
+          UI.showToast(`تعذّر جلب بيانات "${entity}" من الخادم`, 'error');
+        }
+        return this._localList(entity);
+      }
+    }
+    return this._localList(entity);
+  },
+
+  /**
+   * يجلب سجل واحد بمعرّفه.
+   * @returns {Promise<Object|null>}
+   */
+  async get(entity, id) {
+    if (this.isApiConfigured() && this._apiEntity(entity)) {
+      try {
+        const response = await this._apiEntity(entity).get(id);
+        return (response && response.data) || null;
+      } catch (error) {
+        console.error(`DataStore.get(${entity}) API error:`, error);
+        if (typeof UI !== 'undefined') {
+          UI.showToast(`تعذّر جلب السجل من الخادم`, 'error');
+        }
+        return this._localGet(entity, id);
+      }
+    }
+    return this._localGet(entity, id);
+  },
+
+  /**
+   * ينشئ سجلًا جديدًا. يرجع السجل الناتج (بعد إضافة id من الخادم).
+   * @returns {Promise<Object>}
+   */
+  async create(entity, data) {
+    if (this.isApiConfigured() && this._apiEntity(entity)) {
+      const response = await this._apiEntity(entity).create(data);
+      if (!response || response.success === false) {
+        throw new Error((response && response.message) || 'تعذّر إنشاء السجل على الخادم');
+      }
+      const newId = response.data && response.data.id;
+      // بعض نقاط النهاية ترجع فقط { id }، فنعيد جلب السجل الكامل لضمان
+      // ظهور كل الحقول (مفيد لو الواجهة محتاجة تستخدم السجل مباشرة بعد الإنشاء)
+      const record = Object.assign({ id: newId }, data);
+      return record;
+    }
+    return this._localCreate(entity, data);
+  },
+
+  /**
+   * يحدّث سجلًا موجودًا.
+   * @returns {Promise<Object|null>}
+   */
+  async update(entity, id, data) {
+    if (this.isApiConfigured() && this._apiEntity(entity)) {
+      const response = await this._apiEntity(entity).update(id, data);
+      if (!response || response.success === false) {
+        throw new Error((response && response.message) || 'تعذّر تحديث السجل على الخادم');
+      }
+      return Object.assign({ id }, data);
+    }
+    return this._localUpdate(entity, id, data);
+  },
+
+  /**
+   * يحذف سجلًا.
+   * @returns {Promise<boolean>}
+   */
+  async delete(entity, id) {
+    if (this.isApiConfigured() && this._apiEntity(entity)) {
+      const response = await this._apiEntity(entity).delete(id);
+      if (!response || response.success === false) {
+        throw new Error((response && response.message) || 'تعذّر حذف السجل على الخادم');
+      }
+      return true;
+    }
+    return this._localDelete(entity, id);
+  },
+
+  /**
+   * يرجع عدد سجلات الكيان.
+   * @returns {Promise<number>}
+   */
+  async count(entity) {
+    const items = await this.list(entity);
+    return items.length;
+  },
+
+  // =========================================
+  // نسخة احتياطية عبر LocalStorage (تُستخدم فقط لو الـ API غير مهيأ
+  // أو فشل الاتصال بالخادم مؤقتًا). غير مخصّصة للاستخدام الإنتاجي.
+  // =========================================
+  _localList(entity) {
     return Utils.storage.get(this._key(entity), []) || [];
   },
 
-  get(entity, id) {
-    const items = this.list(entity);
+  _localGet(entity, id) {
+    const items = this._localList(entity);
     return items.find(item => String(item.id) === String(id)) || null;
   },
 
-  create(entity, data) {
-    const items = this.list(entity);
+  _localCreate(entity, data) {
+    const items = this._localList(entity);
     const nextId = items.length ? Math.max(...items.map(i => parseInt(i.id) || 0)) + 1 : 1;
     const now = new Date().toISOString();
     const record = Object.assign({ id: nextId, createdAt: now, updatedAt: now }, data);
@@ -68,8 +202,8 @@ const DataStore = {
     return record;
   },
 
-  update(entity, id, data) {
-    const items = this.list(entity);
+  _localUpdate(entity, id, data) {
+    const items = this._localList(entity);
     const index = items.findIndex(item => String(item.id) === String(id));
     if (index === -1) return null;
     items[index] = Object.assign({}, items[index], data, {
@@ -89,8 +223,8 @@ const DataStore = {
     return items[index];
   },
 
-  delete(entity, id) {
-    const items = this.list(entity);
+  _localDelete(entity, id) {
+    const items = this._localList(entity);
     const target = items.find(item => String(item.id) === String(id));
     const filtered = items.filter(item => String(item.id) !== String(id));
 
@@ -104,10 +238,6 @@ const DataStore = {
     }
 
     return filtered.length !== items.length;
-  },
-
-  count(entity) {
-    return this.list(entity).length;
   },
 
   clearAll() {

@@ -330,6 +330,31 @@ const API = {
   },
 
   // ====================
+  // Sales Returns Endpoints
+  // ====================
+  salesReturns: {
+    async list(params = {}) {
+      return API.get('sales_returns_list', params);
+    },
+
+    async get(id) {
+      return API.get('sales_returns_get', { id });
+    },
+
+    async create(data) {
+      return API.post('sales_returns_create', data);
+    },
+
+    async update(id, data) {
+      return API.post('sales_returns_update', { id, ...data });
+    },
+
+    async delete(id) {
+      return API.delete('sales_returns_delete', { id });
+    }
+  },
+
+  // ====================
   // Purchases Endpoints
   // ====================
   purchases: {
@@ -351,6 +376,31 @@ const API = {
 
     async delete(id) {
       return API.delete('purchases_delete', { id });
+    }
+  },
+
+  // ====================
+  // Purchase Returns Endpoints
+  // ====================
+  purchaseReturns: {
+    async list(params = {}) {
+      return API.get('purchase_returns_list', params);
+    },
+
+    async get(id) {
+      return API.get('purchase_returns_get', { id });
+    },
+
+    async create(data) {
+      return API.post('purchase_returns_create', data);
+    },
+
+    async update(id, data) {
+      return API.post('purchase_returns_update', { id, ...data });
+    },
+
+    async delete(id) {
+      return API.delete('purchase_returns_delete', { id });
     }
   },
 
@@ -480,6 +530,31 @@ const API = {
   },
 
   // ====================
+  // Calendar Events Endpoints
+  // ====================
+  calendarEvents: {
+    async list(params = {}) {
+      return API.get('calendar_events_list', params);
+    },
+
+    async get(id) {
+      return API.get('calendar_events_get', { id });
+    },
+
+    async create(data) {
+      return API.post('calendar_events_create', data);
+    },
+
+    async update(id, data) {
+      return API.post('calendar_events_update', { id, ...data });
+    },
+
+    async delete(id) {
+      return API.delete('calendar_events_delete', { id });
+    }
+  },
+
+  // ====================
   // Reports Endpoints
   // ====================
   reports: {
@@ -535,6 +610,32 @@ const API = {
 
     async clear() {
       return API.post('logs_clear');
+    }
+  },
+
+  // ====================
+  // Backups Endpoints
+  // ====================
+  backups: {
+    async list(params = {}) {
+      return API.get('backups_list', params);
+    },
+
+    async delete(id) {
+      return API.delete('backups_delete', { id });
+    }
+  },
+
+  // ====================
+  // Notifications Endpoints
+  // ====================
+  notifications: {
+    async list(params = {}) {
+      return API.get('notifications_list', params);
+    },
+
+    async markRead(id) {
+      return API.post('notifications_mark_read', { id });
     }
   },
 
