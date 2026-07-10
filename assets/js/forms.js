@@ -187,6 +187,14 @@ const Forms = {
       fields: [
         { name: 'name', label: 'الاسم', type: 'text', required: true },
         { name: 'email', label: 'البريد الإلكتروني', type: 'email', required: true },
+        { name: 'password', label: 'كلمة المرور', type: 'password', required: true,
+          requiredOnCreateOnly: true, minlength: 8,
+          placeholder: 'كلمة مرور قوية لا تقل عن 8 أحرف',
+          editHint: 'اتركه فارغًا للإبقاء على كلمة المرور الحالية' },
+        { name: 'passwordConfirm', label: 'تأكيد كلمة المرور', type: 'password', required: true,
+          requiredOnCreateOnly: true, minlength: 8,
+          placeholder: 'أعد كتابة نفس كلمة المرور',
+          editHint: 'اتركه فارغًا لو لم تغيّر كلمة المرور' },
         { name: 'role', label: 'الدور', type: 'select', required: true,
           options: buildRoleOptions('super_admin', 'admin', 'accountant', 'sales_representative', 'warehouse_employee') },
         { name: 'status', label: 'الحالة', type: 'select', required: true,
@@ -297,9 +305,11 @@ const Forms = {
       const colClass = field.colClass || 'col-md-6';
       let inputHtml = '';
 
+      const isRequired = field.required && !(field.requiredOnCreateOnly && this.currentId);
+
       if (field.type === 'select') {
         inputHtml = `
-          <select class="form-select" name="${field.name}" ${field.required ? 'required' : ''}>
+          <select class="form-select" name="${field.name}" ${isRequired ? 'required' : ''}>
             <option value="" disabled ${!value ? 'selected' : ''}>اختر...</option>
             ${field.options.map(opt => `<option value="${opt.value}" ${String(value) === String(opt.value) ? 'selected' : ''}>${opt.label}</option>`).join('')}
           </select>`;
@@ -311,17 +321,21 @@ const Forms = {
           value="${Utils.sanitizeHtml(value !== undefined && value !== null ? String(value) : '')}"
           ${field.placeholder ? `placeholder="${Utils.sanitizeHtml(field.placeholder)}"` : ''}
           ${field.step ? `step="${field.step}"` : ''}
+          ${field.minlength ? `minlength="${field.minlength}"` : ''}
           ${field.type === 'date' && field.allowFuture ? 'data-allow-future="true"' : ''}
           ${field.suggestFrom ? `list="datalist-${field.name}"` : ''}
-          ${field.required ? 'required' : ''}
+          ${isRequired ? 'required' : ''}
         >
         ${field.suggestFrom ? this._buildDatalist(field) : ''}`;
       }
 
+      const hintText = (field.requiredOnCreateOnly && this.currentId && field.editHint) ? field.editHint : field.hint;
+
       return `
         <div class="${colClass}">
-          <label class="form-label">${field.label}${field.required ? ' <span class="text-danger">*</span>' : ''}</label>
+          <label class="form-label">${field.label}${isRequired ? ' <span class="text-danger">*</span>' : ''}</label>
           ${inputHtml}
+          ${hintText ? `<small class="form-text text-muted">${hintText}</small>` : ''}
         </div>`;
     }).join('') + `</div>`;
   },
@@ -360,10 +374,11 @@ const Forms = {
   /**
    * معالجة إرسال النموذج: تحقق، حفظ، تحديث الصفحة
    */
-  _handleSubmit() {
+  async _handleSubmit() {
     const form = document.getElementById('app-form-modal-form');
     const formData = new FormData(form);
     const data = {};
+    const isEditing = !!this.currentId;
 
     for (const field of this.currentSchema.fields) {
       let value = formData.get(field.name);
@@ -373,8 +388,12 @@ const Forms = {
       data[field.name] = value;
     }
 
-    // تحقق أساسي من الحقول المطلوبة
-    const missing = this.currentSchema.fields.filter(f => f.required && (data[f.name] === '' || data[f.name] === null || data[f.name] === undefined));
+    // تحقق أساسي من الحقول المطلوبة (مع مراعاة الحقول المطلوبة فقط عند
+    // الإنشاء، زي كلمة المرور اللي يجوز تُترك فارغة عند التعديل)
+    const missing = this.currentSchema.fields.filter(f => {
+      const isRequired = f.required && !(f.requiredOnCreateOnly && isEditing);
+      return isRequired && (data[f.name] === '' || data[f.name] === null || data[f.name] === undefined);
+    });
     if (missing.length > 0) {
       UI.showToast(`يرجى تعبئة الحقول المطلوبة: ${missing.map(f => f.label).join('، ')}`, 'error');
       return;
@@ -382,16 +401,53 @@ const Forms = {
 
     const entity = this.currentSchema.entity;
 
-    // عند حفظ مستخدم، اربط صلاحياته تلقائيًا بدوره المختار
-    // (مصدر الحقيقة الوحيد: CONFIG.ROLE_PERMISSIONS)
-    if (entity === 'users' && data.role) {
-      data.permissions = CONFIG.ROLE_PERMISSIONS[data.role]
-        ? Object.assign({}, CONFIG.ROLE_PERMISSIONS[data.role])
-        : {};
+    // معالجة خاصة بحقل كلمة المرور (مستخدمين فقط)
+    if (entity === 'users') {
+      if (data.password || data.passwordConfirm) {
+        if (data.password !== data.passwordConfirm) {
+          UI.showToast('كلمة المرور وتأكيدها غير متطابقين', 'error');
+          return;
+        }
+        if (data.password.length < 8) {
+          UI.showToast('كلمة المرور يجب ألا تقل عن 8 أحرف', 'error');
+          return;
+        }
+      } else if (isEditing) {
+        // تُرك فارغًا عند التعديل = لا تغيير في كلمة المرور
+        delete data.password;
+      }
+      // حقل التأكيد للتحقق في الواجهة فقط، لا يُرسل للخادم أبدًا
+      delete data.passwordConfirm;
+
+      // الصلاحيات تُشتق دائمًا من الدور تلقائيًا (مصدر الحقيقة: CONFIG.ROLE_PERMISSIONS)
+      if (data.role) {
+        data.permissions = CONFIG.ROLE_PERMISSIONS[data.role]
+          ? Object.assign({}, CONFIG.ROLE_PERMISSIONS[data.role])
+          : {};
+      }
     }
 
     try {
-      if (this.currentId) {
+      if (entity === 'users' && typeof DataStore !== 'undefined' && DataStore.isApiConfigured()) {
+        // المستخدمون لازم يُنشأوا فعليًا عبر الخادم (Apps Script) حتى يقدروا
+        // يسجّلوا دخول حقيقي، وليس فقط يُحفظوا محليًا في متصفح المدير
+        if (isEditing) {
+          await API.users.update(this.currentId, data);
+        } else {
+          await API.users.create(data);
+        }
+        UI.showToast(isEditing ? 'تم تحديث بيانات المستخدم بنجاح' : 'تم إنشاء المستخدم بنجاح، ويمكنه تسجيل الدخول الآن', 'success');
+      } else if (entity === 'users') {
+        // وضع العرض التجريبي (بدون API حقيقي): لا يوجد نظام حسابات فعلي
+        // لتسجيل الدخول به، لذلك لا نخزّن كلمة المرور محليًا إطلاقًا
+        delete data.password;
+        if (isEditing) {
+          DataStore.update(entity, this.currentId, data);
+        } else {
+          DataStore.create(entity, data);
+        }
+        UI.showToast('تم الحفظ في وضع العرض التجريبي فقط. لتفعيل تسجيل دخول حقيقي، اربط رابط Apps Script من الإعدادات.', 'warning');
+      } else if (isEditing) {
         DataStore.update(entity, this.currentId, data);
         UI.showToast('تم تحديث البيانات بنجاح', 'success');
       } else {
