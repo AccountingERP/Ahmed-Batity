@@ -2,10 +2,10 @@
    Ahmed Batity ERP - Service Worker
    ========================================= */
 
-const CACHE_NAME = 'ahmed-batity-erp-v8';
-const STATIC_CACHE = 'static-v8';
-const DYNAMIC_CACHE = 'dynamic-v8';
-const IMAGE_CACHE = 'images-v8';
+const CACHE_NAME = 'ahmed-batity-erp-v9';
+const STATIC_CACHE = 'static-v9';
+const DYNAMIC_CACHE = 'dynamic-v9';
+const IMAGE_CACHE = 'images-v9';
 
 const STATIC_ASSETS = [
   '/',

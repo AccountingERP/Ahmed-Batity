@@ -15,14 +15,14 @@
  * 3. تحقق من كلمات المرور عبر الخادم (Google Apps Script) فقط، وليس في الفرونت إند.
  */
 const DEMO_CREDENTIALS = Object.freeze({
-  email: 'AhmedBatity@example.com',
-  password: '2231986'
+  email: 'admin@example.com',
+  password: 'admin123'
 });
 
 const CONFIG = {
   // API Configuration
   API: {
-    BASE_URL: 'https://script.google.com/macros/s/AKfycbxUWeIIifeVRqD9L8FI7TaO3E3jRTSqYtII7Jedquy_J4B8OPPfY6KnEKQsnd8m1DTITg/exec',
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbxulJ1kswB3rOp8_g_DU2R44Iis7-IBDP061H2Y-2T3SVutf50vnja5ZJukUTEpCQN0ew/exec',
     TIMEOUT: 30000,
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000
@@ -175,6 +175,7 @@ const CONFIG = {
       purchases: ['*'],
       'purchase-returns': ['*'],
       reports: ['view', 'print'],
+      calendar: ['view', 'add', 'edit'],
       tasks: ['view', 'add', 'edit']
     },
 
